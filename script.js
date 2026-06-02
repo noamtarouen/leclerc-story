@@ -144,6 +144,46 @@ function loop() {
 }
 loop();
 
+/* -------- PARALLAX DES PHOTOS ISOLÉES -------- */
+// Cible : .photo-card (bio), .monaco-photo. Pas les .photo-tile (qui ont déjà des transforms CSS).
+const parallaxPhotos = document.querySelectorAll('.photo-card[data-parallax], .monaco-photo[data-parallax]');
+function updateParallax() {
+  parallaxPhotos.forEach(el => {
+    const speed = parseFloat(el.dataset.parallax) || 0.2;
+    const rect = el.getBoundingClientRect();
+    const windowH = window.innerHeight;
+    const center = rect.top + rect.height / 2;
+    const offset = (center - windowH / 2) / windowH; // -1..1
+    const ty = -offset * speed * 100;
+    const rotX = offset * speed * 8;
+    el.style.transform = `translateY(${ty}px) rotateX(${rotX}deg)`;
+  });
+
+  // .photo-tile via custom property (compose avec transform CSS de base)
+  document.querySelectorAll('.photo-tile[data-parallax]').forEach(el => {
+    const speed = parseFloat(el.dataset.parallax) || 0.2;
+    const rect = el.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const offset = (center - window.innerHeight / 2) / window.innerHeight;
+    el.style.setProperty('--py', `${-offset * speed * 80}px`);
+  });
+}
+window.addEventListener('scroll', updateParallax, { passive: true });
+updateParallax();
+
+/* -------- 3D TILT SUR LE CASQUE (souris) -------- */
+const helmetPhoto = document.querySelector('.helmet-photo');
+if (helmetPhoto) {
+  document.addEventListener('mousemove', (e) => {
+    // Ne pas tilter si on n'est plus sur la scène
+    const sceneRect = scene.getBoundingClientRect();
+    if (sceneRect.bottom < 0 || sceneRect.top > window.innerHeight) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    helmetPhoto.style.transform = `rotateY(${x * 6}deg) rotateX(${-y * 4}deg)`;
+  });
+}
+
 /* -------- REVEAL AT SCROLL -------- */
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {

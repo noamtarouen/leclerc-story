@@ -274,17 +274,73 @@ a { text-decoration: none; color: inherit; }
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* --- LE CASQUE --- */
+/* --- LE CASQUE (vraie photo) --- */
 .layer-helmet {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.helmet {
-  width: clamp(280px, 38vw, 520px);
-  height: auto;
-  filter: drop-shadow(0 30px 50px rgba(220,0,0,.4));
-  transition: filter .3s;
+.helmet-photo {
+  position: relative;
+  width: clamp(320px, 44vw, 620px);
+  aspect-ratio: 3 / 4;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.7),
+    0 0 80px rgba(220,0,0,.35),
+    0 0 0 1px rgba(255,30,30,.3);
+  transition: box-shadow .3s;
+}
+.helmet-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  display: block;
+  filter: contrast(1.08) saturate(1.15) brightness(.95);
+}
+/* Overlay vignette + tinte rouge pour intégration */
+.helmet-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.4) 80%, rgba(0,0,0,.7) 100%),
+    linear-gradient(180deg, rgba(220,0,0,.1) 0%, transparent 40%, rgba(0,0,0,.3) 100%);
+  pointer-events: none;
+}
+/* Cadre type viseur tactique */
+.helmet-frame {
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+}
+.frame-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--ferrari-bright);
+  filter: drop-shadow(0 0 6px var(--ferrari-bright));
+}
+.frame-corner.tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.frame-corner.tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.frame-corner.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.frame-corner.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+.frame-tag {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  background: rgba(0,0,0,.6);
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid rgba(255,198,10,.4);
+  text-shadow: 0 0 6px rgba(255,198,10,.4);
 }
 
 /* --- Titre overlay --- */
@@ -454,6 +510,176 @@ a { text-decoration: none; color: inherit; }
   letter-spacing: 2px;
   color: var(--gold);
   text-transform: uppercase;
+}
+
+/* ============ PHOTO CARDS (parallax) ============ */
+.photo-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.55),
+    0 0 0 1px rgba(255,30,30,.2);
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform .6s ease, box-shadow .4s ease;
+}
+.photo-card:hover {
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.7),
+    0 0 40px rgba(220,0,0,.4),
+    0 0 0 1px rgba(255,30,30,.4);
+}
+.photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.05) saturate(1.1);
+  transition: transform .8s ease;
+}
+.photo-card:hover img { transform: scale(1.05); }
+.photo-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.85) 100%);
+  pointer-events: none;
+}
+.photo-label {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.photo-loc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+}
+.photo-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* ============ GALERIE PARALLAX ============ */
+.gallery {
+  margin-top: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  perspective: 1500px;
+}
+.photo-tile {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    0 25px 50px rgba(0,0,0,.6),
+    0 0 0 1px rgba(255,30,30,.15);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform .8s cubic-bezier(.2,.7,.3,1), box-shadow .4s;
+  cursor: pointer;
+}
+.photo-tile { --py: 0px; }
+.photo-tile:nth-child(1) { transform: translateY(calc(40px + var(--py))) rotateY(4deg); }
+.photo-tile:nth-child(2) { transform: translateY(var(--py)) rotateY(0deg); }
+.photo-tile:nth-child(3) { transform: translateY(calc(40px + var(--py))) rotateY(-4deg); }
+.photo-tile:hover {
+  transform: translateY(0) rotateY(0deg) scale(1.03) !important;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.75),
+    0 0 50px rgba(220,0,0,.35);
+}
+.photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.05) saturate(1.1) brightness(.95);
+  transition: transform 1s ease;
+}
+.photo-tile:hover img { transform: scale(1.08); }
+.photo-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 40%, rgba(0,0,0,.5) 75%, rgba(0,0,0,.95) 100%);
+  pointer-events: none;
+}
+.photo-tile figcaption {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  right: 18px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tile-loc {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  color: var(--gold);
+}
+.tile-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* ============ MONACO PHOTO ============ */
+.monaco-photo {
+  position: relative;
+  margin: 80px auto 0;
+  max-width: 520px;
+  aspect-ratio: 4 / 5;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow:
+    0 40px 100px rgba(0,0,0,.7),
+    0 0 60px rgba(220,0,0,.3);
+  will-change: transform;
+}
+.monaco-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.06) saturate(1.15);
+}
+.monaco-photo-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.45) 100%),
+    linear-gradient(180deg, transparent 60%, rgba(220,0,0,.15) 100%);
+  pointer-events: none;
+}
+.monaco-photo::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--ferrari-bright), var(--gold));
+  z-index: -1;
+  filter: blur(20px);
+  opacity: .4;
 }
 
 /* ============ CARRIÈRE (timeline) ============ */
@@ -746,7 +972,16 @@ footer {
   text-align: center;
   font-size: 13px;
   color: var(--mute);
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
 }
+.credits a {
+  color: var(--gold);
+  border-bottom: 1px dotted rgba(255,198,10,.4);
+}
+.credits a:hover { color: var(--ferrari-bright); }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 980px) {
@@ -763,6 +998,9 @@ footer {
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .monaco-marks { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: 1fr; gap: 18px; }
+  .photo-tile { transform: none !important; }
+  .helmet-photo { width: clamp(260px, 78vw, 420px); }
 }
 
 @media (max-width: 720px) {
